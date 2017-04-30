@@ -113,19 +113,7 @@ func main() {
 	queries := readData(reader)
 
 	for i := 0; i < toInt(queries); i++ {
-		var connectedCom int
-		visited := make(map[int]bool)
 		q := readQuery(reader)
-		adjCities := q.initAdjMat()
-		fmt.Println(adjCities)
-		for j := 1; j <= q.n; j++ {
-			if _, ok := visited[j]; !ok {
-				//if a city has not been visited
-				//dfs(j, adjCities, visited)
-				connectedCom++
-			}
-		}
-		fmt.Println(connectedCom)
-		fmt.Println(q.croad*(q.n-connectedCom) + q.clib*connectedCom)
+		fmt.Println(q.processQuery())
 	}
 }

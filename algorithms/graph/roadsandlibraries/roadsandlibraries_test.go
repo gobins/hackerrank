@@ -63,7 +63,7 @@ func TestInitAdjMat(t *testing.T) {
 }
 
 func TestProcessQuery(t *testing.T) {
-	var q = Query{
+	var q1 = Query{
 		m:     3,
 		n:     3,
 		clib:  2,
@@ -84,10 +84,37 @@ func TestProcessQuery(t *testing.T) {
 		},
 	}
 
-	c := q.processQuery()
+	c := q1.processQuery()
 
 	if c != 4 {
 		t.Errorf("Calculated Cost %d is not equal to expected cost %d", c, 4)
+	}
+
+	var q2 = Query{
+		m:     3,
+		n:     3,
+		clib:  2,
+		croad: 3,
+		connections: []*Connect{
+			{
+				u: 1,
+				v: 2,
+			},
+			{
+				u: 3,
+				v: 1,
+			},
+			{
+				u: 2,
+				v: 3,
+			},
+		},
+	}
+
+	c = q2.processQuery()
+
+	if c != 6 {
+		t.Errorf("Calculated Cost %d is not equal to expected cost %d", c, 6)
 	}
 }
 
