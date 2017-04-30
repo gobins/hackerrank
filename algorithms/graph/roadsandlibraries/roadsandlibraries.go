@@ -102,8 +102,8 @@ func (q *Query) processQuery() int {
 				dfs(j, adjCities)
 				connectedCom++
 			}
+			cost = q.croad*(q.n-connectedCom) + (q.clib * connectedCom)
 		}
-		cost = q.croad*(q.n-connectedCom) + (q.clib * connectedCom)
 	}
 	return cost
 }
