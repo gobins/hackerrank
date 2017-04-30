@@ -15,12 +15,19 @@ type Query struct {
 	clib        int //cost to build a library
 	croad       int //cost to build a road
 	connections []*Connect
+	cost        int
 }
 
 //Connect struct
 type Connect struct {
 	u int //city number
 	v int //city number
+}
+
+//City struct
+type City struct {
+	neighbours []int
+	visited    bool
 }
 
 func readData(reader *bufio.Reader) string {
@@ -53,12 +60,72 @@ func readQuery(reader *bufio.Reader) Query {
 	return q
 }
 
+func (q *Query) initAdjMat() map[int]City {
+	adjCities := make(map[int]City)
+	for _, c := range q.connections {
+		var nc1 City
+		c1 := adjCities[c.u]
+		nc1.neighbours = append(c1.neighbours, c.v)
+		adjCities[c.u] = nc1
+
+		var nc2 City
+		c2 := adjCities[c.v]
+		nc2.neighbours = append(c2.neighbours, c.u)
+		adjCities[c.v] = nc2
+	}
+	return adjCities
+}
+
+func dfs(city int, adjC map[int]City) {
+	c := adjC[city]
+	c.visited = true
+	adjC[city] = c
+	for _, n := range c.neighbours {
+		nc := adjC[n]
+		if !nc.visited {
+			//if a city has not been visited
+			dfs(n, adjC)
+		}
+	}
+}
+
+func (q *Query) processQuery() int {
+	adjCities := q.initAdjMat()
+	var connectedCom int
+	var cost int
+	if q.croad >= q.clib || q.m == 0 {
+		cost = q.clib * q.n
+	} else {
+		for j := 1; j <= q.n; j++ {
+			v := adjCities[j]
+			if !v.visited {
+				dfs(j, adjCities)
+				connectedCom++
+			}
+		}
+		cost = q.croad*(q.n-connectedCom) + (q.clib * connectedCom)
+	}
+	return cost
+}
+
 func main() {
 	reader := bufio.NewReader(os.Stdin)
-	data := readData(reader)
-	var input []Query
-	for i := 0; i < toInt(data); i++ {
-		input = append(input, readQuery(reader))
+	queries := readData(reader)
+
+	for i := 0; i < toInt(queries); i++ {
+		var connectedCom int
+		visited := make(map[int]bool)
+		q := readQuery(reader)
+		adjCities := q.initAdjMat()
+		fmt.Println(adjCities)
+		for j := 1; j <= q.n; j++ {
+			if _, ok := visited[j]; !ok {
+				//if a city has not been visited
+				//dfs(j, adjCities, visited)
+				connectedCom++
+			}
+		}
+		fmt.Println(connectedCom)
+		fmt.Println(q.croad*(q.n-connectedCom) + q.clib*connectedCom)
 	}
-	fmt.Println(input)
 }
